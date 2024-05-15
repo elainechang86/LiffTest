@@ -1,61 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIFF Form</title>
-    <script src="https://static.line-scdn.net/liff/edge/2.1/liff.js"></script>
+    <title>LIFF Example</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script>
+        async function main() {
+            await liff.init({
+                liffId: "YOUR_LIFF_ID"
+            });
+
+            document.getElementById("sendButton").onclick = async() => {
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                } else {
+                    await liff.sendMessages([{
+                        type: 'text',
+                        text: '我完成了'
+                    }]);
+                    liff.closeWindow();
+                }
+            };
+        }
+
+        main();
+    </script>
 </head>
 
 <body>
-    <h1>LIFF Form</h1>
-    <form id="myForm">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
-        <br>
-        <button type="submit">Submit</button>
-    </form>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            liff.init({
-                liffId: 'YOUR_LIFF_ID'
-            }).then(() => {
-                document.getElementById('myForm').addEventListener('submit', function(event) {
-                    event.preventDefault();
-                    sendMessage();
-                });
-            }).catch((err) => {
-                console.error('LIFF Initialization failed ', err);
-            });
-        });
-
-        function sendMessage() {
-            liff.getProfile().then(profile => {
-                fetch('/send-message', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        userId: profile.userId,
-                        message: '我完成了'
-                    })
-                }).then(response => {
-                    if (response.ok) {
-                        liff.closeWindow();
-                    } else {
-                        console.error('Failed to send message');
-                    }
-                }).catch(err => {
-                    console.error('Error:', err);
-                });
-            }).catch(err => {
-                console.error('Error getting profile:', err);
-            });
-        }
-    </script>
+    <button id="sendButton">Send Message and Close LIFF</button>
 </body>
 
 </html>
